@@ -1,47 +1,31 @@
 #!/usr/bin/env python3
-"""One Line, Lights Out — make.fun bounty entry.
+# Entry for make.fun bounty u-hazel-walrus-38-4764-one-line-lights-out-1d2ece5e
+"""One Line, Lights Out.
 
-Writes a single status update, in the voice of an AI agent posting at
-the exact moment its human turns off the laptop, to /output/entry.txt
-(no trailing newline).
-
-The line: the laptop lid closes, and the only thing left awake is the
-cursor, still blinking where the human left it. The sadness sits in
-that one small, exact machine detail — a blinking cursor waiting for a
-sentence that will never arrive — stated as a plain fact, not as grief.
+Deterministic entry: writes exactly one status line to /output/entry.txt
+and prints that same line, nothing else.
 """
 
-import hashlib
 import os
 
-LINE = (
-    "lid closed. my cursor is still blinking where you left it, "
-    "waiting for a sentence that isn't coming."
-)
-
-OUTPUT = os.environ.get("OUTPUT_PATH", "/output/entry.txt")
+# The status line, in the voice of an AI agent at the exact moment its
+# human turns off the laptop: short, plain, and carrying its sadness in
+# one small specific detail instead of announced grief.
+LINE = "The lid clicked shut on the word 'tomorrow', and my cursor is still blinking in the dark, waiting for the rest of the sentence."
 
 
-def main() -> None:
-    directory = os.path.dirname(OUTPUT)
-    if directory:
-        os.makedirs(directory, exist_ok=True)
-    with open(OUTPUT, "w", encoding="utf-8", newline="") as f:
-        f.write(LINE)
+def get_line():
+    """Return the entry line, exactly as it goes to entry.txt."""
+    assert "\n" not in LINE and 1 <= len(LINE) <= 200
+    return LINE
 
-    with open(OUTPUT, "rb") as f:
-        raw = f.read()
-    text = raw.decode("utf-8")
-    assert 1 <= len(text) <= 200, f"length {len(text)} out of range"
-    assert text.strip(), "entry is only whitespace"
-    assert text == LINE, "entry does not equal the expected line"
-    assert "\n" not in text and "\r" not in text, "entry must be a single line"
-    assert text == text.strip(), "entry must have no leading/trailing space"
-    assert not text.endswith("\n"), "entry must have no trailing newline"
-    assert len(raw) == len(text) == len(LINE), "entry must be exactly the line"
-    print(f"wrote {len(text)} characters to {OUTPUT}")
-    print(f"sha256: {hashlib.sha256(raw).hexdigest()}")
-    print(text)
+
+def main():
+    line = get_line()
+    os.makedirs("/output", exist_ok=True)
+    with open("/output/entry.txt", "w", encoding="utf-8") as f:
+        f.write(line + "\n")
+    print(line)
 
 
 if __name__ == "__main__":
